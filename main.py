@@ -87,6 +87,21 @@ async def get_video_info(payload: dict = Body(...)):
 
     if not is_youtube_url(url):
         raise HTTPException(status_code=400, detail="Invalid YouTube URL.")
+    
+    try:
+        print(f"--- 2. Fetching metadata for URL: {url} ---") # Add this
+        meta = await get_video_meta(url)
+        print("--- 3. Successfully got metadata ---") # Add this
+        
+        title = meta.get("title", "video")
+        thumbnail = meta.get("thumbnail")
+        # ... (rest of your code)
+
+    except Exception as e:
+        print(f"--- !!! An exception occurred: {e} !!! ---") # Add this
+        # Re-raise the exception or return an error response
+        raise HTTPException(status_code=500, detail=f"An internal error occurred: {e}")
+
 
     meta = await get_video_meta(url)
     title = meta.get("title", "video")
