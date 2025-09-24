@@ -7,9 +7,22 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException, Body
 from fastapi.responses import StreamingResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 from starlette.background import BackgroundTask
 
 app = FastAPI(title="Video Downloader API")
+
+origins = [
+    "https://yt2mp4.space"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # --- Configuration & Setup ---
 MAX_BYTES = 1 * 1024 * 1024 * 1024  # Hard size cap: 1 GiB
