@@ -1,5 +1,5 @@
 // --- API URL Configuration ---
-const API_BASE_URL = "https://yt-downloader-api-isf5.onrender.com/"; // REPLACE THIS with your actual Render URL
+const API_BASE_URL = "https://yt-downloader-api-isf5.onrender.com"; // REPLACE THIS with your actual Render URL
 
 // --- DOM Elements ---
 const getElem = (id) => document.getElementById(id);
