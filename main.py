@@ -183,37 +183,39 @@ async def download_video(payload: dict = Body(...)):
     dl_cmd = ["yt-dlp", "--no-playlist", "-f", format_selector, "-o", "-", url]
     if format == "mp4":
         dl_cmd.extend(["--merge-output-format", "mp4"])
-    proc = await asyncio.create_subprocess_exec(*dl_cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
+    proc = await asyncio.create_subprocess_exec(
+        *dl_cmd, 
+        stdout=asyncio.subprocess.PIPE, 
+        stderr=asyncio.subprocess.PIPE
+    )
+
     async def stream_content():
+        total_bytes = 0
         try:
-            # We need to wait for the process to finish to check stderr
-            stdout_data, stderr_data = await proc.communicate()
-            stderr_output = stderr_data.decode(errors="ignore")
-
-            if proc.returncode != 0:
-                if "age-restricted" in stderr_output or "Sign in to confirm your age" in stderr_output:
-                    # We can't raise HTTPException here as headers are already sent.
-                    # This stream will be empty, and the client will see a failed download.
-                    # A better architecture (websockets) would solve this.
-                    print("Age-restricted video download failed.")
-                    return # End the stream
-                if "does not start with a start code" not in stderr_output:
-                     print(f"yt-dlp failed: {stderr_output[-1000:]}")
-                     return
-
-            # Stream the captured stdout data
-            total_bytes = 0
-            chunk_size = 65536
-            for i in range(0, len(stdout_data), chunk_size):
-                chunk = stdout_data[i:i+chunk_size]
+            # Stream stdout chunk by chunk without waiting for the process to finish
+            async for chunk in proc.stdout:
                 total_bytes += len(chunk)
                 if total_bytes > MAX_BYTES:
                     print("File too large, stopping stream.")
+                    proc.kill() # Terminate the process if the file is too big
                     break
                 yield chunk
 
+            # Crucial: After streaming, await the process to get the return code 
+            # and check for errors that might have occurred during the download.
+            await proc.wait() 
+            if proc.returncode != 0:
+                stderr_data = await proc.stderr.read()
+                stderr_output = stderr_data.decode(errors="ignore")
+                # This error often appears on stderr even on success, so we can ignore it.
+                if "does not start with a start code" not in stderr_output:
+                     print(f"yt-dlp failed with return code {proc.returncode}: {stderr_output[-1000:]}")
+        
         finally:
-            if proc.returncode is None: proc.kill()
+            # Ensure the process is killed if it's still running for any reason
+            if proc.returncode is None:
+                proc.kill()
+            await proc.wait()
 
     headers = {"Content-Disposition": f'attachment; filename="{filename}"'}
     return StreamingResponse(stream_content(), media_type=f"video/{ext}", headers=headers)
