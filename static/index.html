@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>YT2MP4 - YT url converter - Simple & Fast</title>
+  <meta name="description" content="A fast, simple video link processor." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <h1>YT2MP4</h1>
+        <span class="tagline">Turn a video link into MP4, WEBM, or MP3</span>
+      </div>
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <svg id="iconMoon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        <svg id="iconSun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg>
+        <span class="sr-only">Toggle theme</span>
+      </button>
+    </header>
+
+    <section class="card">
+      <form id="form" novalidate>
+        <h2 class="h2">Process a link</h2>
+        <input type="url" id="url" name="url" placeholder="Paste video URL (https://…)" required inputmode="url" autocomplete="off" />
+
+        <div class="row">
+          <label>
+            <span class="notice">Format</span>
+            <select id="format" name="format">
+              <option value="mp4">MP4 (video)</option>
+              <option value="webm">WEBM (video)</option>
+              <option value="mp3">MP3 (audio)</option>
+            </select>
+          </label>
+
+          <label id="qualityWrap">
+            <span class="notice">Quality</span>
+            <select id="quality" name="quality">
+                <option value="best">Best</option>
+                <option value="2160p">2160p (4K)</option>
+                <option value="1440p">1440p (2K)</option>
+                <option value="1080p">1080p</option>
+                <option value="720p">720p</option>
+                <option value="480p">480p</option>
+            </select>
+          </label>
+          
+          <label id="bitrateWrap" style="display: none;">
+            <span class="notice">Bitrate</span>
+            <select id="bitrate" name="bitrate">
+              <option value="320">320 kbps (Best)</option>
+              <option value="192">192 kbps (Standard)</option>
+              <option value="128">128 kbps (Smallest)</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="terms-check-wrap">
+          <input type="checkbox" id="terms" name="terms">
+          <label for="terms">I agree to the <a href="/terms" target="_blank">Terms of Service</a> and confirm I have the right to download this content.</label>
+        </div>
+
+        <button class="primary" id="submitBtn" type="submit" disabled>Fetch Details</button>
+
+        <div class="status" id="status" role="status" aria-live="polite"></div>
+      </form>
+    </section>
+
+    <!-- Video Info Section (hidden by default) -->
+    <section id="videoInfo" class="card video-info-card">
+        <div class="thumbnail-wrap">
+            <img id="thumbnail" src="" alt="Video thumbnail">
+        </div>
+        <div class="details-wrap">
+            <h3 id="videoTitle"></h3>
+            <p id="estimatedSize"></p>
+            <button class="primary" id="downloadBtn">Download</button>
+            <div class="progress-wrap" id="downloadProgressWrap" style="display: none;">
+                <div class="progress" id="downloadProgress"></div>
+            </div>
+        </div>
+    </section>
+    
+    <div class="support-section">
+      <div class="support-card">
+        <h3>Support This Project</h3>
+        <p>If you find this tool useful, please consider supporting its development. Your contributions help cover server costs and keep the service running.</p>
+        <div class="support-buttons">
+          <!-- IMPORTANT: Replace '#' with your actual Buy Me a Coffee link -->
+          <a href="https://buymeacoffee.com/YT2MP4" target="_blank" class="support-button coffee">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 21.35A6.5 6.5 0 0 0 18 19a2.5 2.5 0 0 0-4-3H8a2.5 2.5 0 0 0-4 3 6.5 6.5 0 0 0 8 2.35Z"></path><path d="M6 16h10"></path><path d="M14.5 13H18a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h1.5"></path><path d="M8 10h4"></path><path d="M8 7h4"></path></svg>
+            <span>Buy Me a Coffee</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <a href="/terms">Terms</a>
+      <span>&bull;</span>
+      <a href="/privacy">Privacy</a>
+      <span>&bull;</span>
+      <a href="/dmca">DMCA</a>
+      <span>&bull;</span>
+      <span>© <span id="year"></span> yt2mp4.space</span>
+    </footer>
+  </div>
+
+  <script src="/app.js" defer></script>
+</body>
+</html>
+
